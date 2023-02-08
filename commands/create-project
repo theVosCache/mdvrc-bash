@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -e
+
+cli_help_deploy() {
+  echo "
+Command: create-project
+
+Create a project of given composer project
+
+Usage: 
+  create-project <laravel-zero, symfony, symfony-web>"
+  exit 1
+}
+
+[ ! -n "$1" ] && cli_help_deploy
+
+COMPOSER_PROJECT_TYPE=$1
+
+if ! [ -x "$(command -v docker)" ]; then
+  echo 'Error: docker is not installed.'
+  exit 1
+fi
+
+case "$COMPOSER_PROJECT_TYPE" in
+  laravel-zero)
+    docker run --rm -v "${PWD}:/app" -w "/app" -u "1000:1000" composer composer create-project laravel-zero/laravel-zero .
+    ;;
+  symfony)
+    docker run --rm -v "${PWD}:/app" -w "/app" -u "1000:1000" composer composer create-project symfony/skeleton .
+    ;;
+  symfony-web)
+    docker run --rm -v "${PWD}:/app" -w "/app" -u "1000:1000" composer composer create-project symfony/skeleton .
+    docker run --rm -v "${PWD}:/app" -w "/app" -u "1000:1000" composer composer require webapp
+    ;;
+  *)
+    cli_help_deploy
+    ;;
+esac

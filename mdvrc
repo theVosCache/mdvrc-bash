@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2155
+# shellcheck disable=SC2046
+
+set -e
+export MDVRC_WORKDIR=$(cd $(dirname $0) && pwd)
+
+cli_help() {
+  cli_name=${0##*/}
+  echo "
+$cli_name
+MDV RC CLI
+Version: $(cat $MDVRC_WORKDIR/VERSION)
+
+Usage: $cli_name [command]
+
+Commands:
+  create-project    Create a new project
+  *                 Help
+"
+  exit 1
+}
+
+case "$1" in
+  create-project)
+    "$MDVRC_WORKDIR/commands/create-project" "$2"
+    ;;
+  *)
+    cli_help
+    ;;
+esac
