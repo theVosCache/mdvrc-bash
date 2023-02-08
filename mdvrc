@@ -25,6 +25,9 @@ case "$1" in
   create-project)
     "$MDVRC_WORKDIR/commands/create-project" "$2"
     ;;
+  dev-proxy)
+    "$MDVRC_WORKDIR/commands/dev-proxy"
+    ;;
   *)
     cli_help
     ;;

@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+# Based on EnriseDevProxy
+# Credit: https://gitlab.enrise.com/Enrise/DevProxy
+
+if ($(docker ps | grep -q mdv-dev-proxy)); then
+  echo "Development hosts proxy is already running."
+  exit 0
+fi
+
+mkdir -p ~/.mdv-dev-proxy/config || true
+mkdir -p ~/.mdv-dev-proxy/certs || true
+
+echo "Starting development hosts proxy... "
+docker network create mdv-dev-proxy > /dev/null 2>&1 || true
+(docker run \
+    -d \
+    --rm \
+    -p 80:80 \
+    -p 443:443 \
+    -p 10081:10081 \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v ~/.mdv-dev-proxy/config:/var/config:ro \
+    -v ~/.mdv-dev-proxy/certs:/var/certs:ro \
+    --name mdv-dev-proxy \
+    --network mdv-dev-proxy \
+    traefik:v2.9 \
+    --api.insecure=true \
+    --providers.docker=true \
+    --providers.docker.exposedbydefault=false \
+    --providers.file.directory=/var/config \
+    --providers.file.watch=true \
+    --entrypoints.web.address=:80 \
+    --entrypoints.web-secure.address=:443 \
+    --entrypoints.traefik.address=:10081 > /dev/null && echo "started")
